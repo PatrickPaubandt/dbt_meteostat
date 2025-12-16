@@ -1,8 +1,7 @@
-WITH mart_selected_faa_stats_weather AS (
+WITH weather_base AS (
     SELECT *
-    FROM {{ ref('prep_flights') }}
-    WHERE origin IN ('LAX','JFK','MIA')
-       OR dest   IN ('LAX','JFK','MIA')
+    FROM {{ ref('prep_weather_daily') }}
+    WHERE airport_code IN ('LAX','JFK','MIA')
 ),
 
 dep_stats AS (
@@ -16,7 +15,8 @@ dep_stats AS (
         SUM(CASE WHEN cancelled = 0 THEN 1 ELSE 0 END) AS occurred_dep_flights,
         COUNT(DISTINCT tail_number) AS uni_dep_airplanes,
         COUNT(DISTINCT airline) AS uni_dep_airlines
-    FROM mart_selected_faa_stats_weather
+    FROM {{ ref('prep_flights') }}
+    WHERE origin IN ('LAX','JFK','MIA')
     GROUP BY origin, flight_date
 ),
 
@@ -31,14 +31,15 @@ arr_stats AS (
         SUM(CASE WHEN cancelled = 0 THEN 1 ELSE 0 END) AS occurred_arr_flights,
         COUNT(DISTINCT tail_number) AS uni_arr_airplanes,
         COUNT(DISTINCT airline) AS uni_arr_airlines
-    FROM mart_selected_faa_stats_weather
+    FROM {{ ref('prep_flights') }}
+    WHERE dest IN ('LAX','JFK','MIA')
     GROUP BY dest, flight_date
 ),
 
 combined_stats AS (
     SELECT
-        d.flight_date,
-        d.airport_code,
+        w.date AS flight_date,
+        w.airport_code,
 
         d.uni_dep_connections,
         a.uni_arr_connections,
@@ -49,11 +50,23 @@ combined_stats AS (
         d.occurred_dep_flights + a.occurred_arr_flights AS occurred_flights,
 
         ROUND((d.uni_dep_airplanes + a.uni_arr_airplanes)::NUMERIC / 2, 1) AS avg_unique_airplanes,
-        ROUND((d.uni_dep_airlines + a.uni_arr_airlines)::NUMERIC / 2, 1) AS avg_unique_airlines
+        ROUND((d.uni_dep_airlines + a.uni_arr_airlines)::NUMERIC / 2, 1) AS avg_unique_airlines,
 
-    FROM dep_stats d
-    JOIN arr_stats a
-      USING (flight_date, airport_code)
+        w.min_temp_c,
+        w.max_temp_c,
+        w.precipitation_nm,
+        w.max_snow_mm,
+        w.avg_wind_direction,
+        w.avg_wind_speed_kmh,
+        w.wind_peakgust_kmh
+
+    FROM weather_base w
+    LEFT JOIN dep_stats d
+      ON w.airport_code = d.airport_code
+     AND w.date = d.flight_date
+    LEFT JOIN arr_stats a
+      ON w.airport_code = a.airport_code
+     AND w.date = a.flight_date
 ),
 
 stats_add_airport AS (
@@ -67,20 +80,6 @@ stats_add_airport AS (
       ON c.airport_code = ai.faa
 )
 
-SELECT
-    s.*,
-
-    w.min_temp_c,
-    w.max_temp_c,
-    w.precipitation_mm,
-    w.max_snow_mm,
-    w.avg_wind_direction,
-    w.avg_wind_speed_kmh,
-    w.wind_peakgust_kmh
-
-FROM stats_add_airport s
-LEFT JOIN {{ ref('prep_weather_daily') }} w
-  ON s.airport_code = w.airport_code
- AND s.flight_date = w.date
-
-ORDER BY s.airport_code, s.flight_date
+SELECT *
+FROM stats_add_airport
+ORDER BY airport_code, flight_date
