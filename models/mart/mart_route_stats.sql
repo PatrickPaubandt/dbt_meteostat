@@ -1,27 +1,38 @@
 WITH mart_route_stats AS (
-    SELECT * 
-    FROM {{ref('prep_flights')}}
+    SELECT *
+    FROM {{ ref('prep_flights') }}
 ),
+
 route_creation AS (
-    SELECT *, origin || ' - ' || dest  AS route
-    FROM mart_route_stats),
+    SELECT
+        *,
+        origin || ' - ' || dest AS route
+    FROM mart_route_stats
+),
+
 route_stats AS (
-	SELECT route, origin, dest,
-	       Count(*) AS total_flights,
-	       COUNT(DISTINCT tail_number) AS unique_airplanes,
-	       COUNT(DISTINCT airline),
-	       AVG (actual_elapsed_time) AS avg_elapsed_time,
-	       AVG (arr_delay) AS avg_arr_delay,
-	       AVG(EXTRACT(EPOCH FROM actual_elapsed_time)) * INTERVAL '1 second' AS avg_elapsed_time_int,
-	       AVG(EXTRACT(EPOCH FROM arr_delay)) * INTERVAL '1 second' AS avg_arr_delay_int,
-	       MAX (arr_delay) AS max_delay,
-	       MIN (arr_delay) AS min_delay,
-	       SUM (cancelled) AS total_cancellations,
-	       SUM (diverted) AS total_diverted
-	FROM route_creation
-	GROUP BY route, origin, dest),
+    SELECT
+        route,
+        origin,
+        dest,
+        COUNT(*) AS total_flights,
+        COUNT(DISTINCT tail_number) AS unique_airplanes,
+        COUNT(DISTINCT airline) AS unique_airlines,
+        AVG(actual_elapsed_time) AS avg_elapsed_time,
+        AVG(arr_delay) AS avg_arr_delay,
+        AVG(actual_elapsed_time) * INTERVAL '1 minute' AS avg_elapsed_time_int,
+        AVG(arr_delay) * INTERVAL '1 minute' AS avg_arr_delay_int,
+        MAX(arr_delay) AS max_delay,
+        MIN(arr_delay) AS min_delay,
+        SUM(cancelled) AS total_cancellations,
+        SUM(diverted) AS total_diverted
+    FROM route_creation
+    GROUP BY route, origin, dest
+),
+
 route_stats_enriched AS (
-	SELECT rs.*,
+    SELECT
+        rs.*,
 
         orig.city    AS origin_city,
         orig.country AS origin_country,
