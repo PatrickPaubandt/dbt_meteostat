@@ -4,7 +4,7 @@ WITH mart_route_stats AS (
 ),
 route_creation AS (
     SELECT *, origin || ' - ' || dest  AS route
-    FROM mart_faa_stats),
+    FROM mart_route_stats),
 route_stats AS (
 	SELECT route, origin, dest,
 	       Count(*) AS total_flights,
