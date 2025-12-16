@@ -54,7 +54,7 @@ combined_stats AS (
 
         w.min_temp_c,
         w.max_temp_c,
-        w.precipitation_nm,
+        w.precipitation_mm,
         w.max_snow_mm,
         w.avg_wind_direction,
         w.avg_wind_speed_kmh,
