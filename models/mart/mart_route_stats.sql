@@ -9,7 +9,7 @@ route_stats AS (
 	SELECT route, origin, dest,
 	       Count(*) AS total_flights,
 	       COUNT(DISTINCT tail_number) AS unique_airplanes,
-	       COUNT(DISTINCT ailine),
+	       COUNT(DISTINCT airline),
 	       AVG (actual_elapsed_time) AS avg_elapsed_time,
 	       AVG (arr_delay) AS avg_arr_delay,
 	       AVG(EXTRACT(EPOCH FROM actual_elapsed_time)) * INTERVAL '1 second' AS avg_elapsed_time_int,
