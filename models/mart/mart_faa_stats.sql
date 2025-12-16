@@ -26,7 +26,7 @@ arr_stats AS (
 ),
 combined_stats AS (
     SELECT d.airport_code,
-           d.uni_dep_connections + a.uni_arr_connections AS unique_connections,
+           d.uni_dep_connections,a.uni_arr_connections,
            d.planned_dep_flights + a.planned_arr_flights AS planned_flights,
            d.cancelled_dep_flights + a.cancelled_arr_flights AS total_cancellations,
            d.diverted_dep_flights + a.diverted_arr_flights AS total_diverted,
