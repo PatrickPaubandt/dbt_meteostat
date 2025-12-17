@@ -5,5 +5,5 @@ with category_data as (
 
 select
     category_id,
-    category_name,
+    category_name
 from category_data
