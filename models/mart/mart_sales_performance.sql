@@ -7,10 +7,10 @@ aggregation_sales AS (
         order_year,
         order_month,
         category_name,
-        SUM(revenue) AS total_revenue,
+        ROUND(SUM(revenue),2) AS total_revenue,
         COUNT(DISTINCT order_id) AS total_orders,
-        AVG(revenue) as avg_revenue_per_category,
-        SUM(revenue) * 1.0 / NULLIF(COUNT(DISTINCT order_id), 0) AS avg_revenue_per_order
+        ROUND(AVG(revenue) as avg_revenue_per_category,2),
+        ROUND(SUM(revenue) * 1.0 / NULLIF(COUNT(DISTINCT order_id), 0),2) AS avg_revenue_per_order
 
     FROM sales_performance
     GROUP BY order_year, order_month, category_name
