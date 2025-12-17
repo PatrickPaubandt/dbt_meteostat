@@ -25,9 +25,9 @@ add_names AS (
 			,d.name AS dest_name
 			,f.*
 	FROM flights_stats f
-	LEFT JOIN {{ref('prep_airports')}} o
+	LEFT JOIN {{ref('prep_airport')}} o
 		ON origin=o.faa
-	LEFT JOIN {{ref('prep_airports')}} d
+	LEFT JOIN {{ref('prep_airport')}} d
 		ON dest=d.faa
 )
 SELECT *

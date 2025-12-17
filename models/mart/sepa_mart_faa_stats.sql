@@ -45,6 +45,6 @@ SELECT a.city
 		,a.name
 		, t.* 
 FROM total_stats t
-LEFT JOIN {{ref('prep_airports')}} a
+LEFT JOIN {{ref('prep_airport')}} a
 USING (faa)
 ORDER BY total_diverted DESC
