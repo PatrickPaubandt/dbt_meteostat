@@ -13,3 +13,18 @@ sources:
         - name: flights
         - name: airports
         - name: regions
+
+    - name: northwind
+      schema: northwind
+      tables:
+        - name: categories
+        - name: customer
+        - name: employee_territories
+        - name: employees
+        - name: order_details
+        - name: orders
+        - name: products
+        - name: regions
+        - name: shipper
+        - name: suppliers
+        - name: territories
