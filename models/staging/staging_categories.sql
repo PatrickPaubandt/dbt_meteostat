@@ -6,4 +6,4 @@ with category_data as (
 select
     category_id,
     category_name,
-from categories_data
+from category_data
