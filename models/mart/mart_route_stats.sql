@@ -31,6 +31,9 @@ route_stats AS (
 
         MAX(arr_delay) AS max_delay,
         MIN(arr_delay) AS min_delay,
+        (MAX(arr_delay) * 60) * INTERVAL '1 second' AS max_delay_int,
+
+        (MIN(arr_delay) * 60) * INTERVAL '1 second' AS min_delay_int,
 
         SUM(cancelled) AS total_cancellations,
         SUM(diverted) AS total_diverted
