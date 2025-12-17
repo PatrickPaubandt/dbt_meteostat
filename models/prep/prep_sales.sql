@@ -16,7 +16,7 @@ combined_data as (
            o.order_date,
            extract(year from o.order_date) as order_year,
            extract(month from o.order_date) as order_month,
-           extract(day from o.order_date) as order_day
+           extract(day from o.order_date) as order_day,
            od.unit_price,
            od.quantity,
            od.discount,
