@@ -8,5 +8,5 @@ select
     product_name,
     supplier_id,
     category_id,
-    unit_price::numeric as unit_price,
+    unit_price::numeric as unit_price
 from products_data
