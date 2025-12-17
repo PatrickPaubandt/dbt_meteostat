@@ -2,6 +2,8 @@ WITH weather_base AS (
     SELECT *
     FROM {{ ref('prep_weather_daily') }}
     WHERE airport_code IN ('LAX','JFK','MIA')
+      AND date >= '2025-01-01'
+      AND date <  '2025-02-01'
 ),
 
 dep_stats AS (
