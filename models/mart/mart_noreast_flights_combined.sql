@@ -72,7 +72,7 @@ stats_add_airport AS (
     SELECT
         ai.city,
         ai.name,
-        c.*,
+        c.*
         
     FROM combined_stats c
     LEFT JOIN {{ ref('prep_noreast_airports') }} ai
