@@ -37,7 +37,7 @@ combined_stats AS (
     SELECT
         w.date AS flight_date,
         w.cw,
-        w.date_month
+        w.date_month,
         w.airport_code,
 
         d.uni_dep_connections,
