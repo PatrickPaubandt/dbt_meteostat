@@ -36,6 +36,8 @@ arr_stats AS (
 combined_stats AS (
     SELECT
         w.date AS flight_date,
+        w.cw,
+        w.date_month
         w.airport_code,
 
         d.uni_dep_connections,
@@ -49,7 +51,7 @@ combined_stats AS (
         ROUND((d.uni_dep_airplanes + a.uni_arr_airplanes)::NUMERIC / 2, 1) AS avg_unique_airplanes,
         ROUND((d.uni_dep_airlines + a.uni_arr_airlines)::NUMERIC / 2, 1) AS avg_unique_airlines,
 
-        w.cw,
+        
         w.min_temp_c,
         w.max_temp_c,
         w.precipitation_mm,
