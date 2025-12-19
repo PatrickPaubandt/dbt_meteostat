@@ -41,13 +41,14 @@ combined_stats AS (
         w.airport_code,
 
         CASE
-            WHEN w.cw BETWEEN 1 AND 6 THEN 'previous event'
+            WHEN w.cw BETWEEN 1 AND 6 THEN 'previous'
             WHEN w.cw = 7 THEN 'weather_event'
-            WHEN w.cw BETWEEN 8 AND 14 THEN 'after event'
+            WHEN w.cw BETWEEN 8 AND 14 THEN 'subsequent'
             ELSE NULL
         END AS weather_event,
 
-
+        d.uni_dep_connections,
+        a.uni_arr_connections,
 
         d.planned_dep_flights + a.planned_arr_flights AS planned_flights,
         d.cancelled_dep_flights + a.cancelled_arr_flights AS total_cancellations,
@@ -64,7 +65,14 @@ combined_stats AS (
         w.avg_wind_direction,
         w.avg_wind_speed_kmh,
         w.wind_peakgust_kmh,
-        w.avg_pressure_hpa
+        w.avg_pressure_hpa,
+
+        /* 🌩 Weather severity score (0–1) */
+        ROUND(
+              0.35 * (w.precipitation_mm / 66.0)
+            + 0.40 * (w.max_snow_mm / 46.0)
+            + 0.25 * (w.avg_wind_speed_kmh / 45.4)
+        , 3) AS weather_score
 
     FROM weather_base w
     LEFT JOIN dep_stats d
@@ -75,13 +83,24 @@ combined_stats AS (
      AND w.date = a.flight_date
 ),
 
+combined_with_severity AS (
+    SELECT
+        *,
+        CASE
+            WHEN weather_score < 0.20 THEN 'low'
+            WHEN weather_score < 0.40 THEN 'moderate'
+            WHEN weather_score < 0.60 THEN 'severe'
+            ELSE 'extreme'
+        END AS weather_severity
+    FROM combined_stats
+),
+
 stats_add_airport AS (
     SELECT
         ai.city,
         ai.name,
         c.*
-        
-    FROM combined_stats c
+    FROM combined_with_severity c
     LEFT JOIN {{ ref('prep_noreast_airports') }} ai
       ON c.airport_code = ai.faa
 )
