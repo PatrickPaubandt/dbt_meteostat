@@ -40,8 +40,14 @@ combined_stats AS (
         w.date_month,
         w.airport_code,
 
-        d.uni_dep_connections,
-        a.uni_arr_connections,
+        CASE
+            WHEN w.cw BETWEEN 1 AND 6 THEN 'previous event'
+            WHEN w.cw = 7 THEN 'weather_event'
+            WHEN w.cw BETWEEN 8 AND 14 THEN 'after event'
+            ELSE NULL
+        END AS weather_event,
+
+
 
         d.planned_dep_flights + a.planned_arr_flights AS planned_flights,
         d.cancelled_dep_flights + a.cancelled_arr_flights AS total_cancellations,
@@ -51,7 +57,6 @@ combined_stats AS (
         ROUND((d.uni_dep_airplanes + a.uni_arr_airplanes)::NUMERIC / 2, 1) AS avg_unique_airplanes,
         ROUND((d.uni_dep_airlines + a.uni_arr_airlines)::NUMERIC / 2, 1) AS avg_unique_airlines,
 
-        
         w.min_temp_c,
         w.max_temp_c,
         w.precipitation_mm,
